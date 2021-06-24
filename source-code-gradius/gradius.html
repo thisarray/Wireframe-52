@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>gradius</title>
+  <script src="../../jsgame0.js"></script>
+  <style type="text/css" media="screen">
+body {
+  background-color: white;
+  color: black;
+}
+.hidden {
+  display: none;
+}
+#original {
+  margin-left: 1em;
+}
+  </style>
+</head>
+
+<body>
+<section id="imageLoader" class="hidden">
+  <img class="hidden" src="images/background.png" alt="background" data-name="background">
+  <img class="hidden" src="images/bullet.png" alt="bullet" data-name="bullet">
+  <img class="hidden" src="images/foreground.png" alt="foreground" data-name="foreground">
+  <img class="hidden" src="images/jet.png" alt="jet" data-name="jet">
+  <img class="hidden" src="images/jet2.png" alt="jet2" data-name="jet2">
+  <img class="hidden" src="images/rock1.png" alt="rock1" data-name="rock1">
+  <img class="hidden" src="images/rock2.png" alt="rock2" data-name="rock2">
+  <img class="hidden" src="images/rock3.png" alt="rock3" data-name="rock3">
+</section>
+
+<main>
+<h1>gradius</h1>
+
+<canvas id="screen">
+The game screen appears here if your browser supports the Canvas API.
+</canvas>
+<section id="controls">
+  <button type="button" id="reset">Reset</button>
+  <button type="button" id="pause">Pause</button>
+</section>
+
+<h2>Attribution</h2>
+
+<p><a href="https://wireframe.raspberrypi.org/issues/52">Source Code: Recreate Gradius's rock-spewing volcanoes, pages 64-65, by Mark Vanstone</a>.</p>
+
+<p>Licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/legalcode">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported</a>.</p>
+
+<h2>Original Python code</h2>
+
+<pre id="original"><code>
+# Gradius
+import pgzrun
+from random import randint
+
+jet = Actor(&#x27;jet&#x27;,(400,300))
+bullet = Actor(&#x27;bullet&#x27;, center=(850, 0))
+rocks = []
+
+def draw():
+    screen.blit(&quot;background&quot;, (0, 0))
+    drawRocks()
+    screen.blit(&quot;foreground&quot;, (0, 0))
+    bullet.draw()
+    jet.draw()
+
+def update():
+    if keyboard.up: jet.y = limit(jet.y-5,50,550)
+    if keyboard.down: jet.y = limit(jet.y+5,50,550)
+    if keyboard.left: jet.x = limit(jet.x-5,10,790)
+    if keyboard.right: jet.x = limit(jet.x+5,10,790)
+    if keyboard.space :
+        if bullet.x &gt;= 850 : bullet.pos = (jet.x,jet.y+5)
+    if bullet.x &lt; 850: bullet.x += 20
+    updateRocks()
+
+def limit(n, minn, maxn):
+    return max(min(maxn, n), minn)
+
+def drawRocks():
+    for r in range(0, len(rocks)):
+        rocks[r].draw()
+
+def makeRock(pos):
+    r = len(rocks)
+    if r &lt; 100:
+        rocks.append(Actor(&#x27;rock&#x27;+str(randint(1,3)), center=pos))
+    else:
+        r = getOldRock()
+        rocks[r].pos = pos
+    rocks[r].speed = randint(6,12)
+    rocks[r].dir = (randint(0,60)-30)/10
+
+def updateRocks():
+    if randint(0,10) == 1: makeRock((215,480))
+    if randint(0,10) == 1: makeRock((540,480))
+    shieldsUp = False
+    for r in range(0, len(rocks)):
+        if rocks[r].y &lt; 800:
+            rocks[r].y -= rocks[r].speed
+            rocks[r].x += rocks[r].dir
+            rocks[r].speed -= 0.2
+            if jet.colliderect(rocks[r]):
+                shieldsUp = True
+            if bullet.colliderect(rocks[r]):
+                rocks[r].y = 800
+                bullet.x = 850
+    if shieldsUp == True:
+        jet.image = &quot;jet2&quot;
+    else:
+        jet.image = &quot;jet&quot;
+
+def getOldRock():
+    for r in range(0, len(rocks)):
+        if rocks[r].y &gt;= 800:
+            return r
+
+pgzrun.go()
+</code></pre>
+</main>
+
+<script>
+var jet, bullet, rocks;
+
+function reset() {
+  jet = new Actor('jet');
+  jet.pos = [400, 300];
+  bullet = new Actor('bullet');
+  bullet.center = [850, 0];
+  rocks = [];
+}
+
+function draw() {
+  screen.blit("background", [0, 0]);
+  drawRocks();
+  screen.blit("foreground", [0, 0]);
+  bullet.draw();
+  jet.draw();
+}
+
+function update() {
+  if (keyboard[keys.UP]) {
+    jet.posy = limit(jet.posy - 5, 50, 550);
+  }
+  if (keyboard[keys.DOWN]) {
+    jet.posy = limit(jet.posy + 5, 50, 550);
+  }
+  if (keyboard[keys.LEFT]) {
+    jet.posx = limit(jet.posx - 5, 10, 790);
+  }
+  if (keyboard[keys.RIGHT]) {
+    jet.posx = limit(jet.posx + 5, 10, 790);
+  }
+  if (keyboard[keys.SPACE]) {
+    if (bullet.posx >= 850) {
+      bullet.pos = [jet.posx, jet.posy + 5];
+    }
+  }
+  if (bullet.posx < 850) {
+    bullet.posx += 20;
+  }
+  updateRocks();
+}
+
+function limit(n, minn, maxn) {
+  return Math.max(Math.min(maxn, n), minn);
+}
+
+function drawRocks() {
+  for (let r of rocks) {
+    r.draw();
+  }
+}
+
+/*
+ * Return a random integer N such that min <= N < max.
+ */
+function getRandomInteger(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor((Math.random() * (max - min)) + min);
+}
+
+function makeRock(pos) {
+  let rock = new Actor('rock' + getRandomInteger(1, 4));
+  if (rocks.length < 100) {
+    rock.center = pos;
+    rocks.push(rock);
+  }
+  else {
+    rock = rocks[getOldRock()];
+    rock.pos = pos;
+  }
+  rock.speed = getRandomInteger(6, 13);
+  rock.dir = (getRandomInteger(0, 61) - 30) / 10;
+}
+
+function updateRocks() {
+  if (getRandomInteger(0, 11) === 1) {
+    makeRock([215, 480]);
+  }
+  if (getRandomInteger(0, 11) === 1) {
+    makeRock([540, 480]);
+  }
+  let shieldsUp = false;
+  for (let r of rocks) {
+    if (r.posy < 800) {
+      r.posy -= r.speed;
+      r.posx += r.dir;
+      r.speed -= 0.2;
+      if (jet.colliderect(r)) {
+        shieldsUp = true;
+      }
+      if (bullet.colliderect(r)) {
+        r.posy = 800;
+        bullet.posx = 850;
+      }
+    }
+  }
+  if (shieldsUp) {
+    jet.name = "jet2";
+  }
+  else {
+    jet.name = "jet";
+  }
+}
+
+function getOldRock() {
+  for (let r = 0; r < rocks.length; r++) {
+    if (rocks[r].posy >= 800) {
+      return r;
+    }
+  }
+}
+
+window.addEventListener('load', (event) => {
+  images.LOAD('#imageLoader img');
+  reset();
+  screen.set_mode('#screen', '#reset', '#pause');
+});
+</script>
+</body>
+
+</html>
