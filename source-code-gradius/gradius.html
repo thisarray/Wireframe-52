@@ -45,11 +45,11 @@ The game screen appears here if your browser supports the Canvas API.
 
 <h2>Attribution</h2>
 
-<p><a href="https://wireframe.raspberrypi.org/issues/52">Source Code: Recreate Gradius's rock-spewing volcanoes, pages 64-65, by Mark Vanstone</a>.</p>
+<p><a href="https://wireframe.raspberrypi.com/issues/52">Source Code: Recreate Gradius's rock-spewing volcanoes, pages 64-65, by Mark Vanstone</a>.</p>
 
 <p>Licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/legalcode">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported</a>.</p>
 
-<p><a href="https://www.raspberrypi.org/blog/recreate-gradius-volcanoes-wireframe-52/">Blog post of Source Code</a>.</p>
+<p><a href="https://www.raspberrypi.com/news/recreate-gradius-volcanoes-wireframe-52/">Blog post of Source Code</a>.</p>
 
 <h2>Original Python code</h2>
 
@@ -240,9 +240,7 @@ function getOldRock() {
 }
 
 window.addEventListener('load', (event) => {
-  images.LOAD('#imageLoader img');
-  reset();
-  screen.set_mode('#screen', '#reset', '#pause');
+  screen.init();
 });
 </script>
 </body>
